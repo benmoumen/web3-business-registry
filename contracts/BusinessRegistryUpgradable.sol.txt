@@ -1,0 +1,148 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+contract BusinessRegistryUpgradable is
+    Initializable,
+    ERC1155Upgradeable,
+    OwnableUpgradeable,
+    ERC1155BurnableUpgradeable,
+    UUPSUpgradeable
+{
+    uint256 public nextTokenId;
+
+    struct Company {
+        string name;
+        string registrationNumber;
+        uint256 totalShares;
+        uint256 companyTokenId;
+        uint256 governanceTokenId;
+    }
+
+    // Use a mapping from the Keccak256 hash of the UUID to the Company struct
+    mapping(bytes32 => Company) public companies;
+
+    // Keep a mapping from UUID string to its Keccak256 hash for easy lookup
+    mapping(string => bytes32) public uuidToHash;
+
+    event CompanyRegistered(
+        string indexed uuid,
+        string name,
+        string registrationNumber,
+        uint256 totalShares,
+        uint256 companyTokenId,
+        uint256 governanceTokenId
+    );
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address initialOwner) public initializer {
+        __ERC1155_init("https://static.govchain.technology/tokens/{id}.json");
+        __Ownable_init(initialOwner);
+        __ERC1155Burnable_init();
+        __UUPSUpgradeable_init();
+
+        nextTokenId = 1;
+    }
+
+    function registerCompany(
+        string memory uuid,
+        string memory _name,
+        string memory _registrationNumber,
+        uint256 _totalShares
+    ) public onlyOwner {
+        // Validate UUID format (basic check, you might want to add more robust validation if needed)
+        require(bytes(uuid).length == 36, "Invalid UUID format");
+
+        // Additional validations
+        require(bytes(_name).length > 0, "Company name must be provided");
+        require(
+            bytes(_registrationNumber).length > 0,
+            "Registration number must be provided"
+        );
+        require(_totalShares > 0, "Total shares must be greater than zero");
+
+        // Calculate Keccak256 hash of the UUID
+        bytes32 uuidHash = keccak256(abi.encodePacked(uuid));
+
+        // Check if company already exists using the hash
+        require(
+            bytes(companies[uuidHash].name).length == 0,
+            "Company already registered"
+        );
+
+        uint256 companyTokenId = nextTokenId;
+        uint256 governanceTokenId = nextTokenId + 1;
+
+        nextTokenId += 2;
+
+        companies[uuidHash] = Company({
+            name: _name,
+            registrationNumber: _registrationNumber,
+            totalShares: _totalShares,
+            companyTokenId: companyTokenId,
+            governanceTokenId: governanceTokenId
+        });
+
+        // Store the mapping from UUID string to hash
+        uuidToHash[uuid] = uuidHash;
+
+        // Mint the unique company NFT
+        _mint(msg.sender, companyTokenId, 1, "");
+
+        // Mint ownership tokens corresponding to the number of shares
+        _mint(msg.sender, governanceTokenId, _totalShares, "");
+
+        emit CompanyRegistered(
+            uuid,
+            _name,
+            _registrationNumber,
+            _totalShares,
+            companyTokenId,
+            governanceTokenId
+        );
+    }
+
+    // Function to get company details by UUID string
+    function getCompany(
+        string memory uuid
+    ) public view returns (Company memory) {
+        bytes32 uuidHash = uuidToHash[uuid];
+        require(uuidHash != 0, "Company not found");
+        return companies[uuidHash];
+    }
+
+    function setURI(string memory newuri) public onlyOwner {
+        _setURI(newuri);
+    }
+
+    function mint(
+        address account,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public onlyOwner {
+        _mint(account, id, amount, data);
+    }
+
+    function mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public onlyOwner {
+        _mintBatch(to, ids, amounts, data);
+    }
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
+}
