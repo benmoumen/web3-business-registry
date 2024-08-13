@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
@@ -19,14 +20,7 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
     // Use a mapping from the Keccak256 hash of the UUID to the Company struct
     mapping(bytes32 => Company) public companies;
 
-    event CompanyRegistered(
-        string indexed uuid,
-        string name,
-        string registrationNumber,
-        uint256 totalShares,
-        uint256 companyTokenId,
-        uint256 governanceTokenId
-    );
+    event CompanyRegistered(string indexed uuid, Company company);
 
     constructor(
         address initialOwner
@@ -81,14 +75,7 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         // Mint ownership tokens corresponding to the number of shares
         _mint(msg.sender, company.governanceTokenId, company.totalShares, "");
 
-        emit CompanyRegistered(
-            uuid,
-            company.name,
-            company.registrationNumber,
-            company.totalShares,
-            company.companyTokenId,
-            company.governanceTokenId
-        );
+        emit CompanyRegistered(            uuid,             company        );
     }
 
     // Function to get company details by UUID string
@@ -99,6 +86,26 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         return companies[uuidHash];
     }
 
+    /**
+     * @notice Returns the URI for a given token ID
+     * @param tokenId The token ID
+     * @return The URI string
+     */
+    function uri(uint256 tokenId) public pure override returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "https://govchain.technology/tokens/",
+                    Strings.toString(tokenId),
+                    ".json"
+                )
+            );
+    }
+
+    /**
+     * @notice Sets a new URI for all tokens
+     * @param newuri The new URI string
+     */
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
     }
