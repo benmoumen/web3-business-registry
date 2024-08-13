@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
+/// @title Business Registry Contract
+/// @notice This contract allows for the registration of companies and issuance of token shares using ERC1155 standard.
+/// @dev Inherits from ERC1155, Ownable, and ERC1155Burnable from OpenZeppelin.
 contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
     uint256 public nextTokenId;
 
@@ -22,6 +25,10 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
 
     event CompanyRegistered(string indexed uuid, Company company);
 
+    /**
+     * @notice Constructor to initialize the contract with the initial owner and base URI
+     * @param initialOwner The address of the initial owner
+     */
     constructor(
         address initialOwner
     )
@@ -31,6 +38,11 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         nextTokenId = 1;
     }
 
+    /**
+     * @notice Registers a new company
+     * @param uuid The UUID of the company
+     * @param company The company details
+     */
     function registerCompany(
         string memory uuid,
         Company memory company
@@ -75,10 +87,14 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         // Mint ownership tokens corresponding to the number of shares
         _mint(msg.sender, company.governanceTokenId, company.totalShares, "");
 
-        emit CompanyRegistered(            uuid,             company        );
+        emit CompanyRegistered(uuid, company);
     }
 
-    // Function to get company details by UUID string
+    /**
+     * @notice Gets company details by UUID
+     * @param uuid The UUID of the company
+     * @return The company details
+     */
     function getCompany(
         string memory uuid
     ) public view returns (Company memory) {
@@ -110,6 +126,13 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         _setURI(newuri);
     }
 
+    /**
+     * @notice Mints a new token
+     * @param account The address of the recipient
+     * @param id The token ID to mint
+     * @param amount The amount of tokens to mint
+     * @param data Additional data with no specified format
+     */
     function mint(
         address account,
         uint256 id,
@@ -119,6 +142,13 @@ contract BusinessRegistry is ERC1155, Ownable, ERC1155Burnable {
         _mint(account, id, amount, data);
     }
 
+    /**
+     * @notice Mints multiple new tokens in a batch
+     * @param to The address of the recipient
+     * @param ids An array of token IDs to mint
+     * @param amounts An array of amounts of tokens to mint
+     * @param data Additional data with no specified format
+     */
     function mintBatch(
         address to,
         uint256[] memory ids,
