@@ -55,14 +55,13 @@ describe("BusinessRegistry", function () {
 
     await expect(businessRegistry.registerCompany(companyUUID, companyData))
       .to.emit(businessRegistry, "CompanyRegistered")
-      .withArgs(
-        companyUUID,
-        companyData.name,
-        companyData.registrationNumber,
-        companyData.totalShares,
-        1,
-        2
-      );
+      .withArgs(companyUUID, {
+        name: companyData.name,
+        registrationNumber: companyData.registrationNumber,
+        totalShares: companyData.totalShares,
+        companyTokenId: 1,
+        governanceTokenId: 2,
+      });
 
     const company = await businessRegistry.getCompany(companyUUID);
     expect(company.name).to.equal(companyData.name);
