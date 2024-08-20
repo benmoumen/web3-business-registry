@@ -29,6 +29,7 @@ const config: HardhatUserConfig = {
     //apiKey: process.env.ETHERSCAN_API_KEY,
     apiKey: {
       polygonAmoy: process.env.POLYGON_AMOY_API_KEY as string,
+      //polygonAmoy: process.env.OK_LINK_API_KEY as string,
     },
     customChains: [
       {
@@ -37,6 +38,8 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-amoy.polygonscan.com/api",
           browserURL: "https://amoy.polygonscan.com/",
+          //apiURL: "https://www.oklink.com/api/explorer/v1/contract/verify/async/api/polygonAmoy",
+          //browserURL: "https://www.oklink.com/polygonAmoy",
         },
       },
     ],
