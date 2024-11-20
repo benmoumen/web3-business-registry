@@ -1,10 +1,10 @@
+import "@openzeppelin/hardhat-upgrades";
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter";
 import "@nomicfoundation/hardhat-verify";
 import "hardhat-contract-sizer";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const config: HardhatUserConfig = {
@@ -60,7 +60,7 @@ const config: HardhatUserConfig = {
     disambiguatePaths: false,
     runOnCompile: true,
     strict: true,
-    only: [":TokenizedBusinessRegistry$"],
+    only: [":CompanySharesAsTokens$"],
   },
 };
 

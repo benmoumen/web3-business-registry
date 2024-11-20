@@ -1,0 +1,5 @@
+{
+  "ProxyModule#CompanySharesAsTokens": "0x1d0819057758961E57d7cB023513B926B3cFAC91",
+  "ProxyModule#ERC1967Proxy": "0xe4c7bE043298aa5C7B9b0F48f545fadEd67bA272",
+  "CompanySharesAsTokensModule#CompanySharesAsTokens": "0xe4c7bE043298aa5C7B9b0F48f545fadEd67bA272"
+}

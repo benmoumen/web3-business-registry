@@ -4,21 +4,24 @@
   "description": "Web3 Business Registry Smart Contracts",
   "main": "index.ts",
   "scripts": {
-    "test": "hh test"
+    "build": "npx hardhat typechain",
+    "test": "npx hardhat typechain && REPORT_GAS=true npx hardhat test"
   },
   "author": "UNCTAD - Digital Government Program",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@nomicfoundation/hardhat-verify": "^2.0.9",
-    "ethers": "^6.13.2",
-    "hardhat": "^2.22.8",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.16",
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-gas-reporter": "^1.0.10"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2",
-    "dotenv": "^16.0.0"
+    "@openzeppelin/contracts": "^5.1.0",
+    "@openzeppelin/contracts-upgradeable": "^5.1.0",
+    "@openzeppelin/hardhat-upgrades": "^3.5.0",
+    "dotenv": "^16.4.5"
   }
 }
